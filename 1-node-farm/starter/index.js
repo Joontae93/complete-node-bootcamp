@@ -38,7 +38,11 @@ const url = require('url');
 //////////////////////////////////////
 ///// SERVER
 
+const data = fs.readFileSync(`${__dirname}/dev-data/data.json`, 'utf-8');
+const dataObject = JSON.parse(data);
+
 const server = http.createServer((req, res) => {
+	// Handle Routing
 	const pathName = req.url;
 	switch (pathName) {
 		case '/overview':
@@ -47,6 +51,11 @@ const server = http.createServer((req, res) => {
 			break;
 		case '/product':
 			res.end('This is a PRODUCT PAGE');
+			break;
+		case '/api':
+			res.writeHead(200, { 'Content-Type': 'application/json' });
+			console.log(dataObject);
+			res.end(data);
 			break;
 		default:
 			res.writeHead(404, {
@@ -60,5 +69,3 @@ const server = http.createServer((req, res) => {
 server.listen(8000, 'localhost', 8000, () =>
 	console.log('Listening to requests on port 8000'),
 );
-
-// Handle Routing
