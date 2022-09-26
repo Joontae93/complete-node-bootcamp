@@ -40,18 +40,21 @@ const url = require('url');
 
 const server = http.createServer((req, res) => {
 	const pathName = req.url;
-	if (pathName === '/overview' || pathName === '/') {
-		res.end('This is the OVERVIEW');
-	} else if (pathName === '/product') {
-		res.end('This is a PRODUCT PAGE');
-	} else {
-		res.writeHead(404, {
-			'Content-type': 'text/html',
-			'my-own-header': 'hello world',
-		});
-		res.end('<h1>Page not found!</h1>');
+	switch (pathName) {
+		case '/overview':
+		case '/':
+			res.end('This is the OVERVIEW');
+			break;
+		case '/product':
+			res.end('This is a PRODUCT PAGE');
+			break;
+		default:
+			res.writeHead(404, {
+				'Content-type': 'text/html',
+				'my-own-header': 'hello world',
+			});
+			res.end('<h1>Page not found!</h1>');
 	}
-	res.end('hello from the server!');
 });
 
 server.listen(8000, 'localhost', 8000, () =>
