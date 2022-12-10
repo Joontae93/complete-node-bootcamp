@@ -1,6 +1,8 @@
 const fs = require('fs');
 const http = require('http');
-const url = require('url');
+const { URL, URLSearchParams } = require('url');
+
+const replaceTemplate = require('./modules/replaceTemplate');
 
 //////////////////////////////////////
 ///// FILES
@@ -38,20 +40,6 @@ const url = require('url');
 //////////////////////////////////////
 ///// SERVER
 
-function replaceTemplate(template, product) {
-	let output = template.replace(/{%ProductName%}/g, product.productName);
-	output = output.replace(/{%IMAGE%}/g, product.image);
-	output = output.replace(/{%ProductPrice%}/g, product.price);
-	output = output.replace(/{%Origin%}/g, product.from);
-	output = output.replace(/{%Nutrients%}/g, product.nutrients);
-	output = output.replace(/{%Quantity%}/g, product.quantity);
-	output = output.replace(/{%ID%}/g, product.id);
-	output = output.replace(/{%Description%}/g, product.description);
-
-	if (!product.organic)
-		output = output.replace(/{%Not_Organic%}/g, 'not-organic');
-	return output;
-}
 const tempOverview = fs.readFileSync(
 	`${__dirname}/templates/template-overview.html`,
 	'utf-8',
@@ -68,9 +56,12 @@ const data = fs.readFileSync(`${__dirname}/dev-data/data.json`, 'utf-8');
 const dataObject = JSON.parse(data);
 
 const server = http.createServer((req, res) => {
-	// Handle Routing
-	const pathName = req.url;
-	if (pathName === '/' || pathName === '/overview') {
+	const baseURL = new URL(`https://localhost:8000`);
+	const path = new URL(req.url, baseURL);
+	const { pathname } = path;
+	const query = path.searchParams.get('id');
+
+	if (pathname === '/' || pathname === '/overview') {
 		res.writeHead(200, { 'Content-Type': 'text/html' });
 		const cardsHtml = dataObject
 			.map((el) => replaceTemplate(tempCard, el))
@@ -78,9 +69,13 @@ const server = http.createServer((req, res) => {
 		const output = tempOverview.replace('{%PRODUCT_CARDS%}', cardsHtml);
 
 		res.end(output);
-	} else if (pathName === '/product') {
-		res.end('This is a PRODUCT PAGE');
-	} else if (pathName === '/api') {
+	} else if (pathname === '/product') {
+		res.writeHead(200, { 'Content-Type': 'text/html' });
+		const product = dataObject[query];
+		const output = replaceTemplate(tempProduct, product);
+
+		res.end(output);
+	} else if (pathname === '/api') {
 		res.writeHead(200, { 'Content-Type': 'application/json' });
 		console.log(dataObject);
 		res.end(data);
