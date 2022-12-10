@@ -38,31 +38,58 @@ const url = require('url');
 //////////////////////////////////////
 ///// SERVER
 
+function replaceTemplate(template, product) {
+	let output = template.replace(/{%ProductName%}/g, product.productName);
+	output = output.replace(/{%IMAGE%}/g, product.image);
+	output = output.replace(/{%ProductPrice%}/g, product.price);
+	output = output.replace(/{%Origin%}/g, product.from);
+	output = output.replace(/{%Nutrients%}/g, product.nutrients);
+	output = output.replace(/{%Quantity%}/g, product.quantity);
+	output = output.replace(/{%ID%}/g, product.id);
+	output = output.replace(/{%Description%}/g, product.description);
+
+	if (!product.organic)
+		output = output.replace(/{%Not_Organic%}/g, 'not-organic');
+	return output;
+}
+const tempOverview = fs.readFileSync(
+	`${__dirname}/templates/template-overview.html`,
+	'utf-8',
+);
+const tempCard = fs.readFileSync(
+	`${__dirname}/templates/template-card.html`,
+	'utf-8',
+);
+const tempProduct = fs.readFileSync(
+	`${__dirname}/templates/template-product.html`,
+	'utf-8',
+);
 const data = fs.readFileSync(`${__dirname}/dev-data/data.json`, 'utf-8');
 const dataObject = JSON.parse(data);
 
 const server = http.createServer((req, res) => {
 	// Handle Routing
 	const pathName = req.url;
-	switch (pathName) {
-		case '/overview':
-		case '/':
-			res.end('This is the OVERVIEW');
-			break;
-		case '/product':
-			res.end('This is a PRODUCT PAGE');
-			break;
-		case '/api':
-			res.writeHead(200, { 'Content-Type': 'application/json' });
-			console.log(dataObject);
-			res.end(data);
-			break;
-		default:
-			res.writeHead(404, {
-				'Content-type': 'text/html',
-				'my-own-header': 'hello world',
-			});
-			res.end('<h1>Page not found!</h1>');
+	if (pathName === '/' || pathName === '/overview') {
+		res.writeHead(200, { 'Content-Type': 'text/html' });
+		const cardsHtml = dataObject
+			.map((el) => replaceTemplate(tempCard, el))
+			.join('');
+		const output = tempOverview.replace('{%PRODUCT_CARDS%}', cardsHtml);
+
+		res.end(output);
+	} else if (pathName === '/product') {
+		res.end('This is a PRODUCT PAGE');
+	} else if (pathName === '/api') {
+		res.writeHead(200, { 'Content-Type': 'application/json' });
+		console.log(dataObject);
+		res.end(data);
+	} else {
+		res.writeHead(404, {
+			'Content-type': 'text/html',
+			'my-own-header': 'hello world',
+		});
+		res.end('<h1>Page not found!</h1>');
 	}
 });
 
