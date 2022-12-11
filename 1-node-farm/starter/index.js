@@ -1,7 +1,7 @@
 const fs = require('fs');
 const http = require('http');
 const { URL, URLSearchParams } = require('url');
-
+const slugify = require('slugify');
 const replaceTemplate = require('./modules/replaceTemplate');
 
 //////////////////////////////////////
@@ -54,6 +54,7 @@ const tempProduct = fs.readFileSync(
 );
 const data = fs.readFileSync(`${__dirname}/dev-data/data.json`, 'utf-8');
 const dataObject = JSON.parse(data);
+const slugs = dataObject.map((el) => slugify(el.productName, { lower: true }));
 
 const server = http.createServer((req, res) => {
 	const baseURL = new URL(`https://localhost:8000`);
@@ -77,7 +78,7 @@ const server = http.createServer((req, res) => {
 		res.end(output);
 	} else if (pathname === '/api') {
 		res.writeHead(200, { 'Content-Type': 'application/json' });
-		console.log(dataObject);
+
 		res.end(data);
 	} else {
 		res.writeHead(404, {
