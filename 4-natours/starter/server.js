@@ -1,9 +1,10 @@
 const app = require('./app');
-const { port } = require('./utils');
+const dotenv = require('dotenv');
+dotenv.config();
 
 /**
  * START SERVER
  */
-app.listen(port, () => {
-  console.log(`App running on port ${port}`);
+app.listen(process.env.PORT, () => {
+  console.log(`App running on port ${process.env.PORT}`);
 });

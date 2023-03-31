@@ -4,11 +4,12 @@
   "description": "This repo contains starter files and the finished project files for all the projects contained in the course (complete repo size is **288MB**).",
   "main": "app.js",
   "scripts": {
-    "start": "nodemon server.js"
+    "start": "NODE_ENV=development nodemon server.js"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "dotenv": "^16.0.3",
     "express": "^4.18.2",
     "morgan": "^1.10.0"
   },
