@@ -1,6 +1,15 @@
 const fs = require('fs');
 const { tours } = require('../utils');
 
+exports.checkBody = (req, res, next) => {
+  if (!req.body.price || !req.body.name) {
+    return res.status(404).json({
+      status: 'fail',
+      message: 'Price and/or Name is not set!',
+    });
+  }
+  next();
+};
 exports.checkID = (req, res, next, val) => {
   const tour = tours.find((tour) => tour.id === Number(val));
   if (val > tours.length || !tour) {
@@ -11,7 +20,6 @@ exports.checkID = (req, res, next, val) => {
   }
   next();
 };
-
 exports.getAllTours = (req, res) => {
   res
     .status(200)
@@ -28,7 +36,7 @@ exports.createTour = (req, res) => {
   const newTour = Object.assign({ id: newId }, req.body);
   tours.push(newTour);
   fs.writeFile(
-    `${__dirname}/dev-data/data/tours-simple.json`,
+    `${__dirname}/../dev-data/data/tours-simple.json`,
     JSON.stringify(tours),
     (err) => console.error(err)
   );

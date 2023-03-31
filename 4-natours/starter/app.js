@@ -25,7 +25,6 @@ function myMiddlware(req, res, next) {
   next();
 }
 app.use(myMiddlware);
-
 /**
  * Mount Routers (still middleware, but route specific)
  */
