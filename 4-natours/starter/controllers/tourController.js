@@ -1,14 +1,15 @@
 const fs = require('fs');
-const { api, tours } = require('../utils');
+const { tours } = require('../utils');
 
-exports.isValidTour = (id) => {
-  const tour = tours.find((tour) => tour.id === Number(id));
-  if (id > tours.length || !tour) {
+exports.checkID = (req, res, next, val) => {
+  const tour = tours.find((tour) => tour.id === Number(val));
+  if (val > tours.length || !tour) {
     return res.status(404).json({
       status: 'fail',
       message: 'tour not found! Check the id and try again.',
     });
-  } else return true;
+  }
+  next();
 };
 
 exports.getAllTours = (req, res) => {
@@ -18,16 +19,8 @@ exports.getAllTours = (req, res) => {
 };
 
 exports.getTour = (req, res) => {
-  const id = Number(req.params.id);
-  const tour = tours.find((tour) => tour.id === id);
-  if (id > tours.length || !tour) {
-    res.status(404).json({
-      status: 'fail',
-      message: 'tour not found! Check the id and try again.',
-    });
-  } else {
-    res.status(200).json({ status: 'success', data: tour });
-  }
+  const tour = tours.find((tour) => tour.id === Number(req.params.id));
+  res.status(200).json({ status: 'success', data: tour });
 };
 
 exports.createTour = (req, res) => {
@@ -43,29 +36,11 @@ exports.createTour = (req, res) => {
 };
 
 exports.updateTour = (req, res) => {
-  const id = Number(req.params.id);
-  const tour = tours.find((tour) => tour.id === id);
-  if (id > tours.length || !tour) {
-    res.status(404).json({
-      status: 'fail',
-      message: 'tour not found! Check the id and try again.',
-    });
-  } else {
-    res
-      .status(200)
-      .json({ status: 'success', data: { tour: '<Updated Tour here>...' } });
-  }
+  res
+    .status(200)
+    .json({ status: 'success', data: { tour: '<Updated Tour here>...' } });
 };
 
 exports.deleteTour = (req, res) => {
-  const id = Number(req.params.id);
-  const tour = tours.find((tour) => tour.id === id);
-  if (id > tours.length || !tour) {
-    res.status(404).json({
-      status: 'fail',
-      message: 'tour not found! Check the id and try again.',
-    });
-  } else {
-    res.status(204).json({ status: 'success', data: null });
-  }
+  res.status(204).json({ status: 'success', data: null });
 };

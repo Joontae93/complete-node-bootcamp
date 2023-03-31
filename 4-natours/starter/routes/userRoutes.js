@@ -8,8 +8,6 @@ const {
   deleteUser,
 } = require('../controllers/userController');
 
-// ROUTES -- USERS
-
 router.route(`/`).get(getAllUsers).post(createUser);
 router.route(`/:id`).get(getUser).patch(updateUser).delete(deleteUser);
 
