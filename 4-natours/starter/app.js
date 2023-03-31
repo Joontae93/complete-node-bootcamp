@@ -1,6 +1,7 @@
 // Imports
 const express = require('express');
 const fs = require('fs');
+const morgan = require('morgan');
 
 // Utils
 const port = 8000;
@@ -15,9 +16,23 @@ const tours = JSON.parse(
  */
 
 const app = express();
+
+// MIDDLEWARE
+app.use(morgan('dev'));
 app.use(express.json());
 
-// REST Endpoints
+/** This gets called before or after the .route() method depending on where its called in the codebase!
+ * Since the Router methods call res.json, they end the middleware. If this was placed after the route methods, it would never get called.
+ *
+ * Global middleware is typically defined at the top
+ */
+function myMiddlware(req, res, next) {
+  req.requestTime = new Date().toISOString();
+  next();
+}
+app.use(myMiddlware);
+
+// REST Endpoints (Route Handlers)
 function isValidTour(id) {
   const tour = tours.find((tour) => tour.id === Number(id));
   if (id > tours.length || !tour) {
@@ -93,6 +108,40 @@ function deleteTour(req, res) {
   }
 }
 
+function getAllUsers(req, res) {
+  res.status(500).json({
+    status: 'error',
+    message: "This route isn't working yet.",
+  });
+}
+function getUser(req, res) {
+  res.status(500).json({
+    status: 'error',
+    message: "This route isn't working yet.",
+  });
+}
+function createUser(req, res) {
+  res.status(500).json({
+    status: 'error',
+    message: "This route isn't working yet.",
+  });
+}
+function updateUser(req, res) {
+  res.status(500).json({
+    status: 'error',
+    message: "This route isn't working yet.",
+  });
+}
+function deleteUser(req, res) {
+  res.status(500).json({
+    status: 'error',
+    message: "This route isn't working yet.",
+  });
+}
+
+// ROUTES
+app.route(`${api}/users`).get(getAllUsers).post(createUser);
+app.route(`${api}/users/:id`).get(getUser).patch(updateUser).delete(deleteUser);
 app.route(`${api}/tours`).get(getAllTours).post(createTour);
 app.route(`${api}/tours/:id`).get(getTour).patch(updateTour).delete(deleteTour);
 
